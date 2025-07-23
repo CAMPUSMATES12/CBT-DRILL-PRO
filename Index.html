@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CampusMate – Login or Sign Up</title>
+  <link rel="icon" href="https://i.postimg.cc/vZgC1fGz/IMG-7849.jpg" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #e9f3ff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .auth-container {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .logo {
+      height: 70px;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      color: #2d87f0;
+      margin: 10px 0;
+    }
+
+    p {
+      color: #555;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background: #2d87f0;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+
+    button:hover {
+      background: #186dd9;
+    }
+
+    .toggle-link {
+      color: #2d87f0;
+      cursor: pointer;
+      font-size: 14px;
+      text-decoration: underline;
+      margin-top: 10px;
+    }
+
+    #auth-message {
+      font-size: 14px;
+      color: red;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="auth-container">
+    <img src="https://i.postimg.cc/vZgC1fGz/IMG-7849.jpg" alt="Cbt drill pro Logo" class="logo" />
+
+    <h2 id="form-title"> WELCOME</h2>
+    <p id="form-desc">To access the exclusive contents of the app, please login with your account details.</p>
+
+    <div id="auth-message"></div>
+
+    <!-- Login Form -->
+    <form id="login-form">
+      <input type="email" id="login-email" placeholder="Email Address" required />
+      <input type="password" id="login-password" placeholder="Password" required />
+      <button type="submit">Login</button>
+    </form>
+
+    <!-- Sign Up Form -->
+    <form id="signup-form" style="display: none;">
+      <input type="text" id="fullname" placeholder="Full Name" required />
+      <input type="email" id="email" placeholder="Email Address" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <button type="submit">Sign Up</button>
+    </form>
+
+    <div class="toggle-link" id="toggle-form">Don't have an account? Sign Up</div>
+  </div>
+
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script>
+    const supabaseUrl = "https://woozmmgyvwuaahccpluh.supabase.co";
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indvb3ptbWd5dnd1YWFoY2NwbHVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI4MzI1MjYsImV4cCI6MjA2ODQwODUyNn0.PzSpOTJk0gvdz7L68YGzdhetCogY2p3mCEtHHbDr-u4";
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+    const toggleLink = document.getElementById("toggle-form");
+    const loginForm = document.getElementById("login-form");
+    const signupForm = document.getElementById("signup-form");
+    const formTitle = document.getElementById("form-title");
+    const formDesc = document.getElementById("form-desc");
+    const authMessage = document.getElementById("auth-message");
+
+    toggleLink.addEventListener("click", () => {
+      if (signupForm.style.display === "none") {
+        signupForm.style.display = "block";
+        loginForm.style.display = "none";
+        formTitle.textContent = "Account Sign Up";
+        formDesc.textContent = "Create an account to access the Cbt drill pro app.";
+        toggleLink.textContent = "Already have an account? Login";
+      } else {
+        signupForm.style.display = "none";
+        loginForm.style.display = "block";
+        formTitle.textContent = "Student Login";
+        formDesc.textContent = "To access the exclusive contents of the app, please login with your account details.";
+        toggleLink.textContent = "Don't have an account? Sign Up";
+      }
+    });
+
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("login-email").value.trim();
+      const password = document.getElementById("login-password").value;
+
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        authMessage.textContent = "❌ " + error.message;
+      } else {
+        window.location.href = "home.html";
+      }
+    });
+
+    signupForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const full_name = document.getElementById("fullname").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { full_name, college }
+        }
+      });
+
+      if (error) {
+        authMessage.textContent = "❌ " + error.message;
+      } else {
+        window.location.href = "home.html";
+      }
+    });
+  </script>
+</body>
+</html>
